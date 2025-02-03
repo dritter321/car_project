@@ -33,7 +33,7 @@ resource "aws_lambda_function" "dataproc_lambda" {
   function_name    = var.lambda_function_name
   handler          = "lambda_function.lambda_handler"
   role             = aws_iam_role.lambda_exec_role.arn
-  runtime          = "python3.8"
+  runtime          = "python3.11"
   filename         = "${path.module}/lambda/lambda_function.zip"
   source_code_hash = filebase64sha256("${path.module}/lambda/lambda_function.zip")
   timeout          = var.lambda_timeout
@@ -42,6 +42,7 @@ resource "aws_lambda_function" "dataproc_lambda" {
       OUTPUT_BUCKET = var.buckets["curated_zone"]
     }
   }
+  layers = [aws_lambda_layer_version.pandas_layer.arn]
 }
 
 resource "aws_iam_policy" "lambda_s3_access" {
@@ -129,4 +130,11 @@ resource "aws_iam_role_policy" "lambda_logging_policy" {
       }
     ]
   })
+}
+
+resource "aws_lambda_layer_version" "pandas_layer" {
+  layer_name = "pandas_layer"
+  compatible_runtimes = ["python3.11"]
+  filename = "${path.module}/lambda/pandas_layer.zip"
+  source_code_hash = filebase64sha256("${path.module}/lambda/pandas_layer.zip")
 }

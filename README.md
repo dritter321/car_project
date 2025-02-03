@@ -47,3 +47,4 @@ terraform apply
 
 Development Guide:
 1. In case you modify the lambda function. Recreate the zip file to use.
+2. Create dependency layer for the lambda function with layer_generation.py in lambda directory (pandas_layer.zip)
