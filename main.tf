@@ -1,19 +1,19 @@
 provider "aws" {
-  region = "eu-west-2"
+  region = var.region
 }
 
 resource "aws_s3_bucket" "landing_zone" {
-  bucket = "my-landing-zone-bucket-dritter"
+  bucket = var.buckets["landing_zone"]
   force_destroy = true
 }
 
 resource "aws_s3_bucket" "curated_zone" {
-  bucket = "my-curated-zone-bucket-dritter"
+  bucket = var.buckets["curated_zone"]
   force_destroy = true
 }
 
 resource "aws_iam_role" "lambda_exec_role" {
-  name = "lambda_exec_role"
+  name = var.lambda_role_name
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -29,18 +29,23 @@ resource "aws_iam_role" "lambda_exec_role" {
   })
 }
 
-resource "aws_lambda_function" "example" {
-  function_name    = "MyLambdaFunction"
+resource "aws_lambda_function" "dataproc_lambda" {
+  function_name    = var.lambda_function_name
   handler          = "lambda_function.lambda_handler"
   role             = aws_iam_role.lambda_exec_role.arn
   runtime          = "python3.8"
   filename         = "${path.module}/lambda/lambda_function.zip"
   source_code_hash = filebase64sha256("${path.module}/lambda/lambda_function.zip")
-  timeout          = 30
+  timeout          = var.lambda_timeout
+  environment {
+    variables = {
+      OUTPUT_BUCKET = var.buckets["curated_zone"]
+    }
+  }
 }
 
 resource "aws_iam_policy" "lambda_s3_access" {
-  name        = "lambda_s3_access_policy"
+  name        = var.lambda_policy_name
   description = "IAM policy for accessing S3 buckets in Lambda"
 
   policy = jsonencode({
@@ -53,8 +58,8 @@ resource "aws_iam_policy" "lambda_s3_access" {
         ],
         Effect = "Allow",
         Resource = [
-          "arn:aws:s3:::my-landing-zone-bucket-dritter",
-          "arn:aws:s3:::my-landing-zone-bucket-dritter/*"
+          aws_s3_bucket.landing_zone.arn,
+          "${aws_s3_bucket.landing_zone.arn}/*"
         ]
       },
       {
@@ -64,8 +69,8 @@ resource "aws_iam_policy" "lambda_s3_access" {
         ],
         Effect = "Allow",
         Resource = [
-          "arn:aws:s3:::my-curated-zone-bucket-dritter",
-          "arn:aws:s3:::my-curated-zone-bucket-dritter/*"
+          aws_s3_bucket.curated_zone.arn,
+          "${aws_s3_bucket.curated_zone.arn}/*"
         ]
       }
     ]
@@ -81,7 +86,7 @@ resource "aws_iam_role_policy_attachment" "lambda_s3_access_attachment" {
 resource "aws_lambda_permission" "allow_bucket" {
   statement_id  = "AllowExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.example.function_name
+  function_name = aws_lambda_function.dataproc_lambda.function_name
   principal     = "s3.amazonaws.com"
   source_arn    = aws_s3_bucket.landing_zone.arn
 }
@@ -90,7 +95,7 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
   bucket = aws_s3_bucket.landing_zone.id
 
   lambda_function {
-    lambda_function_arn = aws_lambda_function.example.arn
+    lambda_function_arn = aws_lambda_function.dataproc_lambda.arn
     events              = ["s3:ObjectCreated:*"]
     filter_prefix       = ""
     filter_suffix       = ""
@@ -100,8 +105,8 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
 }
 
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
-  name              = "/aws/lambda/${aws_lambda_function.example.function_name}"
-  retention_in_days = 14  # Set log retention policy (for example, 14 days).
+  name              = "/aws/lambda/${aws_lambda_function.dataproc_lambda.function_name}"
+  retention_in_days = var.cloudwatch_log_retention_days
 }
 
 # Assign the appropriate IAM policy to allow Lambda to log to CloudWatch.
@@ -119,7 +124,7 @@ resource "aws_iam_role_policy" "lambda_logging_policy" {
         Action   = [
           "logs:PutLogEvents"
         ],
-        Resource = "arn:aws:logs:*:*:log-group:/aws/lambda/${aws_lambda_function.example.function_name}:*",
+        Resource = "arn:aws:logs:*:*:log-group:/aws/lambda/${aws_lambda_function.dataproc_lambda.function_name}:*",
         Effect   = "Allow"
       }
     ]

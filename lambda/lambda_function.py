@@ -1,3 +1,4 @@
+import os
 import boto3
 import logging
 logger = logging.getLogger()
@@ -10,7 +11,7 @@ def lambda_handler(event, context):
     input_bucket = event['Records'][0]['s3']['bucket']['name']
     file_key = event['Records'][0]['s3']['object']['key']
     logger.info(f"FILE KEY: {input_bucket} and {file_key}")
-    output_bucket = 'my-curated-zone-bucket-dritter'
+    output_bucket = os.environ['OUTPUT_BUCKET']
     copy_source = {
         'Bucket': input_bucket,
         'Key': file_key

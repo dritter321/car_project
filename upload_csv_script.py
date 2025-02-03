@@ -4,7 +4,7 @@ import boto3
 s3_client = boto3.client('s3')
 
 # Specify the bucket name
-bucket_name = 'my-landing-zone-bucket-dritter'
+bucket_name = 'landing-zone-bucket-dritter'
 
 # Specify the file path and the key in S3 bucket
 file_path = './resources/sample_input.csv'

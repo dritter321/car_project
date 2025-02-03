@@ -29,9 +29,13 @@ XGB:
 - R^2: 0.9614432764528569
 
 # Terraform process
+1. Install Terraform on you machine.
 brew tap hashicorp/tap
 brew install hashicorp/tap/terraform
+2. Create credentials
 create IAM user - with appropriate permission then generate Access Key and Secret Access Key
+3. Configure local environment & Run appropriate command.
+update the terraform variable (variables.tf) with appropriate parameters
 aws configure
 terraform init
 terraform plan
@@ -41,8 +45,5 @@ terraform apply
 - 1. aws s3 cp file.csv s3://your-bucket-name/
 - 2. using the upload_csv_script.py
 
-Execute the terraform configurations in order:
-1. Create buckets with TF
-2. Upload Lambda function:
-aws s3 cp lambda_function.zip s3://my-lambda-bucket-dritter/lambda_function.zip
-3. Create Lambda and other resources with TF
+Development Guide:
+1. In case you modify the lambda function. Recreate the zip file to use.
