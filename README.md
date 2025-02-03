@@ -49,8 +49,6 @@ XGB:
 | 1       | EDA                    | 2025-02-01 | 1                |
 | 2       | Model Experiments      | 2025-02-02 | 2                |
 | 3       | Terraform & AWS Lambda | 2021-02-03 | 4                |
-| 4       | ----                   | 2021-12-04 | -                |
-| 5       | ----                   | 2021-12-05 | -                |
 
 ## Further development features
 
