@@ -29,25 +29,17 @@ XGB:
 - R^2: 0.9614432764528569
 
 # Terraform process
-1. Install Terraform on you machine.
-brew tap hashicorp/tap
-brew install hashicorp/tap/terraform
-2. Create credentials
-create IAM user - with appropriate permission then generate Access Key and Secret Access Key
-3. Configure local environment & Run appropriate command.
-update the terraform variable (variables.tf) with appropriate parameters
-aws configure
-terraform init
-terraform plan
-terraform apply
+1. Execute `./build.sh` to build and deploy the app.
+  - In case the Permission denied, execute `chmod +x build.sh`
+  - For `aws configure` - create IAM user with appropriate permission then generate Access Key and Secret Access Key.
+  - In case, Terraform not installed (mac): brew tap hashicorp/tap && brew install hashicorp/tap/terraform
+  - In case, you want modify name of any resources, access `variables.tf`
+2. You have two options to upload the csv file to the landing bucket and trigger function
+  - aws s3 cp file.csv s3://your-bucket-name/
+  - using the upload_csv_script.py
 
-- You have two options to upload the csv file the landing bucket
-- 1. aws s3 cp file.csv s3://your-bucket-name/
-- 2. using the upload_csv_script.py
-
-Development Guide:
-1. In case you modify the lambda function. Recreate the zip file to use.
-2. Create dependency layer for the lambda function with layer_generation.py in lambda directory (pandas_layer.zip)
+# Development Support:
+- In case you modify dependency layer, use `./lambda/layer_generation.py` (pandas_layer.zip) to recreate it
 
 
 ## Task Time Log
@@ -59,3 +51,10 @@ Development Guide:
 | 3       | Terraform & AWS Lambda | 2021-02-03 | 4                |
 | 4       | ----                   | 2021-12-04 | -                |
 | 5       | ----                   | 2021-12-05 | -                |
+
+## Further development features
+
+- Target bucket could store a parquet file with versioning inputs (currently you need to upload all data in one file)
+- ML Model could have its own deployment with own endpoint
+- Creating unique file name in landing and curated buckets for any uploads
+- Verifying schema of input csv

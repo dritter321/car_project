@@ -31,8 +31,22 @@ def lambda_handler(event, context):
         # Example: Add a new column
         data = data.drop(columns=['car_ID', 'saledate', 'ownername', 'owneremail', 'dealershipaddress', 'iban'])
         logger.info("Dropped features unrequired")
+        data.dropna(subset=['CarName'], inplace=True)
+        data.dropna(subset=['Price'], inplace=True)
+        logger.info("Dropped rows with no CarName or Price")
 
-        # Write the manipulated data back to S3
+        categorical_columns = data.select_dtypes(include='object').columns
+        for column in categorical_columns:
+            mode_value = data[column].mode()[0]
+            data[column].fillna(mode_value, inplace=True)
+        logger.info("Imputed missing categorical values in rows with most common item")
+
+        numerical_columns = data.select_dtypes(include=['int64', 'float64']).columns
+        for column in numerical_columns:
+            mean_value = data[column].mean()
+            data[column].fillna(mean_value, inplace=True)
+        logger.info("Imputed missing numerical values in rows with most common item")
+
         output_file_key = 'manipulated_' + file_key
         output = StringIO()
         data.to_csv(output, index=False)
@@ -46,11 +60,6 @@ def lambda_handler(event, context):
             'body': f'Failed to process file {file_key}. Error: {str(e)}'
         }
 
-    #try:
-    #    s3.copy(copy_source, output_bucket, file_key)
-    #    logger.info(f'File {file_key} copied from {input_bucket} to {output_bucket}')
-    #except Exception as e:
-    #    logger.error(f'Failed to copy file {file_key} from {input_bucket} to {output_bucket}. Error: {str(e)}')
 
     return {
         'statusCode': 200,
