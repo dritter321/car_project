@@ -50,7 +50,7 @@ XGB:
 | 2       | Model Experiments      | 2025-02-02 | 2                |
 | 3       | Terraform & AWS Lambda | 2021-02-03 | 4                |
 
-## Further development features
+## Further development options
 
 - Target bucket could store a parquet file with versioning inputs (currently you need to upload all data in one file)
 - ML Model could have its own deployment with own endpoint
