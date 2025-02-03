@@ -48,3 +48,14 @@ terraform apply
 Development Guide:
 1. In case you modify the lambda function. Recreate the zip file to use.
 2. Create dependency layer for the lambda function with layer_generation.py in lambda directory (pandas_layer.zip)
+
+
+## Task Time Log
+
+| Task ID | Description            | Date       | Time Spent (hrs) |
+|---------|------------------------|------------|------------------|
+| 1       | EDA                    | 2025-02-01 | 1                |
+| 2       | Model Experiments      | 2025-02-02 | 2                |
+| 3       | Terraform & AWS Lambda | 2021-02-03 | 4                |
+| 4       | ----                   | 2021-12-04 | -                |
+| 5       | ----                   | 2021-12-05 | -                |
