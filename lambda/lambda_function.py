@@ -29,7 +29,7 @@ def lambda_handler(event, context):
 
         # Data manipulation with pandas
         # Example: Add a new column
-        data = data.drop(columns=['car_ID', 'car_age', 'saledate', 'ownername', 'owneremail', 'dealershipaddress', 'iban'])
+        data = data.drop(columns=['car_ID', 'saledate', 'ownername', 'owneremail', 'dealershipaddress', 'iban'])
         logger.info("Dropped features unrequired")
 
         # Write the manipulated data back to S3
