@@ -1,7 +1,7 @@
 # AI&ML service line
 Objective: estimating potential selling price of second-hand cars
 Pipeline:
-- .csv files can be uploaded via AWS Management Console or Python script
+- .csv files can be uploaded via AWS Management Console or Python script (upload_csv_script.py)
 - AWS S3 bucket to store data in raw format (landing zone)
 - AWS S3 bucket to store data in processed format (curated zone)
 - Lambda function triggered by new data received in landing zone
